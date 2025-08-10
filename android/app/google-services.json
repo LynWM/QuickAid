@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "721544552009",
+    "project_id": "quickaid-444",
+    "storage_bucket": "quickaid-444.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:721544552009:android:ef9cb0f59a26f3449c2998",
+        "android_client_info": {
+          "package_name": "com.example.quick_aid_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCD2mCtU37Nj5CZBdPfHqfBWVGzht5ZDAM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
