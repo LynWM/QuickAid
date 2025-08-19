@@ -10,8 +10,6 @@ plugins {
 android {
     namespace = "com.example.quick_aid_app"
     compileSdk = 33
-    ndkVersion = flutter.ndkVersion
-
     ndkVersion = "29.0.13599879"
 
     compileOptions {
@@ -26,7 +24,7 @@ android {
     defaultConfig {
         
         applicationId = "com.example.quick_aid_app"
-        minSdk = flutter.minSdkVersion
+        minSdkVersion(23)
         targetSdk = 33
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -44,5 +42,7 @@ android {
 flutter {
     source = "../.."
 }
+
+
 
 apply(plugin = "com.google.gms.google-services")
