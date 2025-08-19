@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:quick_aid_app/components/theme_notifier.dart';
-import 'package:quick_aid_app/components/theme_provider.dart';
 import 'package:quick_aid_app/pages/home_page.dart';
 import 'package:quick_aid_app/pages/intro_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -31,7 +30,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      themeMode: context.watch<ThemeProvider>().themeMode,
 
       theme: ThemeData(
         brightness: Brightness.light,
