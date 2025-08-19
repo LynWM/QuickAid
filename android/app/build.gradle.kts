@@ -26,7 +26,7 @@ android {
     defaultConfig {
         
         applicationId = "com.example.quick_aid_app"
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = 33
         versionCode = flutter.versionCode
         versionName = flutter.versionName
