@@ -8,37 +8,22 @@ import 'package:quick_aid_app/services/login_page.dart';
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
-  Future<String?> _getUserRole(String uid) async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get();
-      if (doc.exists) {
-        return doc['role'] as String?;
-      }
-    } catch (e) {
-      debugPrint("Error fetching role: $e");
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // 1. Still loading
+        //Still loading
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        // 🔹 Case 2: Not logged in → LoginPage
+        // User not logged in → LoginPage
         if (!snapshot.hasData) {
           return const LoginPage();
         }
 
-        // 🔹 Case 3: Logged in → Check Firestore role
+        // User is logged in → HomePage
         final user = snapshot.data!;
         return FutureBuilder<String?>(
           future: _getUserRole(user.uid),
@@ -61,4 +46,20 @@ class AuthGate extends StatelessWidget {
       },
     );
   }
+}
+
+//helper function
+Future<String?> _getUserRole(String uid) async {
+  try {
+    final doc = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .get();
+    if (doc.exists) {
+      return doc.data()?["role"] as String?;
+    }
+  } catch (e) {
+    print("Error fetching role: $e");
+  }
+  return null; 
 }

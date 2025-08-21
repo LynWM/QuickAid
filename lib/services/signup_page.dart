@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_aid_app/components/my_button.dart';
 import 'package:quick_aid_app/components/my_textfield.dart';
-import 'package:quick_aid_app/pages/home_page.dart';
-
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -45,22 +43,22 @@ class _SigninPageState extends State<SignUpPage> {
   }
 
   // Sign Up logic
-Future<void> signUserUp() async {
-  _showLoadingDialog();
+  Future<void> signUserUp() async {
+    _showLoadingDialog();
 
-  try {
-    // 🔹 Create user in Firebase Auth
-    UserCredential userCredential =
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+    try {
+      // Create user in Firebase Auth
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
 
-    final user = userCredential.user;
+      final user = userCredential.user;
 
-    if (user != null) {
-      try {
-        // 🔹 Save user details in Firestore
+      if (user != null) {
+        //try {
+        // Save user details in Firestore
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'name': nameController.text.trim(),
           'email': emailController.text.trim(),
@@ -69,29 +67,18 @@ Future<void> signUserUp() async {
         });
 
         debugPrint("✅ Firestore write successful for user: ${user.uid}");
-      } catch (firestoreError) {
-        debugPrint("❌ Firestore write failed: $firestoreError");
-        if (!mounted) return;
-        Navigator.of(context).pop(); // close loading
-        _showErrorDialog("Failed to save user profile: $firestoreError");
-        return;
       }
 
       if (!mounted) return;
       Navigator.of(context).pop(); // close loading
-
-      // Go to home (AuthGate will redirect correctly anyway)
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+    } on FirebaseAuthException catch (e) {
+      Navigator.of(context).pop(); // close loading
+      _showErrorDialog(e.message ?? "An error occurred.");
+    } catch (e) {
+      Navigator.of(context).pop(); //close loading
+      _showErrorDialog("Unexpected error occurred: $e");
     }
-  } on FirebaseAuthException catch (e) {
-    Navigator.of(context).pop(); // close loading
-    _showErrorDialog(e.message ?? "An error occurred.");
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +90,7 @@ Future<void> signUserUp() async {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.person_add, size: 100),
+                const Icon(Icons.person_add, size: 100, color: Colors.black),
                 const SizedBox(height: 30),
                 Text(
                   'Create your Quick Aid Account',
