@@ -3,12 +3,17 @@ import 'package:quick_aid_app/components/theme_notifier.dart';
 import 'package:quick_aid_app/pages/home_page.dart';
 import 'package:quick_aid_app/pages/intro_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_aid_app/services/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  //trying to fix flow
+  await FirebaseAuth.instance.signOut();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool hasLaunched = prefs.getBool('hasLaunched') ?? false;
@@ -30,55 +35,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primarySwatch: Colors.red,
-        scaffoldBackgroundColor: Colors.white,
-        colorScheme: ColorScheme.light(
-          primary: Colors.red,
-          secondary: Colors.redAccent,
-          background: Colors.white,
-          surface: Colors.white,
-          onBackground: Colors.black,
-          onSurface: Colors.black,
-        ),
-
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.red,
-          foregroundColor: Colors.white,
-        ),
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.black),
-          bodyMedium: TextStyle(color: Colors.black87),
-        ),
-      ),
-
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.red,
-        scaffoldBackgroundColor: Colors.black,
-        colorScheme: ColorScheme.dark(
-          primary: Colors.red,
-          secondary: Colors.redAccent,
-          background: Colors.black,
-          surface: Color(0xFF1E1E1E),
-          onBackground: Colors.white,
-          onSurface: Colors.white,
-        ),
-
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-        ),
-
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.white),
-          bodyMedium: TextStyle(color: Colors.white70),
-        ),
-      ),
-
-      home: startOnIntro ? const IntroPage() : const HomePage(),
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: _getStartPage(),
     );
+  }
+
+  Widget _getStartPage() {
+    if (startOnIntro) {
+      return IntroPage();
+    } else {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        return HomePage();
+      } else {
+        return LoginPage();
+      }
+    }
   }
 }

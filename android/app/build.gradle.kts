@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.quick_aid_app"
-    compileSdk = 33
+    compileSdk = 34
     ndkVersion = "29.0.13599879"
 
     compileOptions {
@@ -24,8 +24,8 @@ android {
     defaultConfig {
         
         applicationId = "com.example.quick_aid_app"
-        minSdkVersion(23)
-        targetSdk = 33
+        minSdkVersion(flutter.minSdkVersion.toInt())
+        targetSdkVersion(flutter.targetSdkVersion.toInt())
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

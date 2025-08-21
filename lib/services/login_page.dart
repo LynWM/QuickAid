@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => AlertDialog(
         title: const Text("Login Failed"),
         content: Text(
-          "Please enter the correect email/password and try again.",
+          "Please enter the correct email/password and try again.",
         ),
         actions: [
           TextButton(

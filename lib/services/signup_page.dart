@@ -45,20 +45,21 @@ class _SigninPageState extends State<SignUpPage> {
   }
 
   // Sign Up logic
-  Future<void> signUserUp() async {
-    _showLoadingDialog();
+Future<void> signUserUp() async {
+  _showLoadingDialog();
 
-    try {
-      // 🔹 Create user in Firebase Auth
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+  try {
+    // 🔹 Create user in Firebase Auth
+    UserCredential userCredential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
 
-      final user = userCredential.user;
+    final user = userCredential.user;
 
-      if (user != null) {
+    if (user != null) {
+      try {
         // 🔹 Save user details in Firestore
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'name': nameController.text.trim(),
@@ -67,20 +68,30 @@ class _SigninPageState extends State<SignUpPage> {
           'createdAt': Timestamp.now(),
         });
 
+        debugPrint("✅ Firestore write successful for user: ${user.uid}");
+      } catch (firestoreError) {
+        debugPrint("❌ Firestore write failed: $firestoreError");
         if (!mounted) return;
         Navigator.of(context).pop(); // close loading
-
-        // Go to home (AuthGate will redirect correctly anyway)
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
+        _showErrorDialog("Failed to save user profile: $firestoreError");
+        return;
       }
-    } on FirebaseAuthException catch (e) {
+
+      if (!mounted) return;
       Navigator.of(context).pop(); // close loading
-      _showErrorDialog(e.message ?? "An error occurred.");
+
+      // Go to home (AuthGate will redirect correctly anyway)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
     }
+  } on FirebaseAuthException catch (e) {
+    Navigator.of(context).pop(); // close loading
+    _showErrorDialog(e.message ?? "An error occurred.");
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
