@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_aid_app/components/my_button.dart';
 import 'package:quick_aid_app/components/my_textfield.dart';
+import 'package:quick_aid_app/services/authgate_page.dart';
+import 'package:quick_aid_app/services/login_page.dart';
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -71,6 +74,11 @@ class _SigninPageState extends State<SignUpPage> {
 
       if (!mounted) return;
       Navigator.of(context).pop(); // close loading
+
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (context) => AuthGate())
+      );
     } on FirebaseAuthException catch (e) {
       Navigator.of(context).pop(); // close loading
       _showErrorDialog(e.message ?? "An error occurred.");
@@ -90,7 +98,7 @@ class _SigninPageState extends State<SignUpPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.person_add, size: 100, color: Colors.black),
+                const Icon(Icons.person_add, size: 70, color: Colors.black),
                 const SizedBox(height: 30),
                 Text(
                   'Create your Quick Aid Account',
@@ -120,6 +128,34 @@ class _SigninPageState extends State<SignUpPage> {
 
                 const SizedBox(height: 25),
                 MyButton(onTap: signUserUp, text: "Sign Up"),
+
+                const SizedBox(height: 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Already a member?',
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),
+                        );
+                      },
+                      child: const Text(
+                        'Log In',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quick_aid_app/components/bottom_nav_bar.dart';
+import 'package:quick_aid_app/pages/dashboard_page.dart';
 import 'package:quick_aid_app/pages/guides_page.dart';
 import 'package:quick_aid_app/pages/hotlines_page.dart';
 import 'package:quick_aid_app/pages/map_page.dart';
@@ -111,6 +112,27 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const SettingsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.only(left: 25.0),
+
+                  child: ListTile(
+                    leading: Icon(Icons.admin_panel_settings, color: Colors.white),
+                    title: Text(
+                      'ADMIN DASHBOARD',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DashboardPage(),
                         ),
                       );
                     },

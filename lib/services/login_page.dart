@@ -31,9 +31,7 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Login Failed"),
-        content: Text(
-          "Please enter the correct email/password and try again.",
-        ),
+        content: Text("Please enter the correct email/password and try again."),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -43,7 +41,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 
   // Firebase login logic
   Future<void> signUserIn() async {
@@ -56,9 +53,12 @@ class _LoginPageState extends State<LoginPage> {
       );
       if (!mounted) return;
       Navigator.of(context).pop(); // Close loading dialog
-      
-      print("Signed in as ${FirebaseAuth.instance.currentUser?.email}"); //debug print
-      
+
+      Navigator.of(context).pop();//trying to remove the loop
+
+      print(
+        "Signed in as ${FirebaseAuth.instance.currentUser?.email}",
+      ); //debug print
     } on FirebaseAuthException catch (e) {
       Navigator.of(context).pop(); // Close loading dialog
 
@@ -86,14 +86,14 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.lock, size: 100, color: Colors.black),
-                
+
                 const SizedBox(height: 30),
 
                 Text(
                   'Welcome to Quick Aid!',
                   style: TextStyle(color: Colors.grey[700], fontSize: 18),
                 ),
-                
+
                 const SizedBox(height: 25),
 
                 MyTextField(

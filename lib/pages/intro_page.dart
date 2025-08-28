@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quick_aid_app/services/login_page.dart';
+import 'package:quick_aid_app/services/authgate_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class IntroPage extends StatelessWidget {
@@ -52,7 +52,7 @@ class IntroPage extends StatelessWidget {
                   await prefs.setBool('hasLaunched', true);
 
                   Navigator.pushReplacement( context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    MaterialPageRoute(builder: (context) => const AuthGate()),
                   );
                 },
 
