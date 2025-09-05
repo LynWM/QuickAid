@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:quick_aid_app/components/admin_dashboard.dart';
+import 'package:quick_aid_app/admin/dashboard_page.dart';
 import 'package:quick_aid_app/pages/home_page.dart';
 import 'package:quick_aid_app/services/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,7 +60,7 @@ class AuthGate extends StatelessWidget {
               });
 
               if (cachedRole == "admin") {
-                return AdminDashboard();
+                return DashboardPage();
               } else {
                 return HomePage();
               }
@@ -77,7 +77,7 @@ class AuthGate extends StatelessWidget {
                 final role = roleSnapshot.data ?? "user";
 
                 if (role == "admin") {
-                  return AdminDashboard();
+                  return DashboardPage();
                 } else {
                   return HomePage();
                 }

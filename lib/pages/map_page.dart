@@ -1,271 +1,217 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_place/google_place.dart';
-import 'package:url_launcher/url_launcher.dart'; // For launching directions link
+import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({Key? key}) : super(key: key);
+  const MapPage({super.key});
 
   @override
-  _MapPageState createState() => _MapPageState();
+  State<MapPage> createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
-  GoogleMapController? mapController;
-  Position? currentPosition;
-  final Set<Marker> _markers = {};
+  final Completer<GoogleMapController> _controller = Completer();
   late GooglePlace googlePlace;
+  List<AutocompletePrediction> predictions = [];
+  TextEditingController searchController = TextEditingController();
 
-  // Store currently selected hospital details to show custom info card
-  DetailsResult? selectedHospitalDetails;
+  LatLng? currentLocation;
+  Marker? selectedMarker;
+  String? selectedHospitalName;
+  String? selectedHospitalAddress;
 
   @override
   void initState() {
     super.initState();
-    googlePlace = GooglePlace(
-      "YOUR_API_KEY_HERE",
-    ); // Replace with your actual API Key
+    googlePlace = GooglePlace("AIzaSyDnTww9skax5GLDSlIQwBbZavDPXe7lXPg"); // Replace with your API key
     _getCurrentLocation();
   }
 
-  void _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
+  Future<void> _getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
       return;
     }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return;
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState(() {
-      currentPosition = position;
+      currentLocation = LatLng(position.latitude, position.longitude);
     });
-    _moveCameraToPosition(position.latitude, position.longitude);
-    _loadNearbyHospitals(position.latitude, position.longitude);
+
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(target: currentLocation!, zoom: 15),
+    ));
   }
 
-  void _moveCameraToPosition(double lat, double lng) {
-    mapController?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(lat, lng),
-          zoom: 14,
-        ), // Zoom 14 is typical city-level
-      ),
-    );
-  }
-
-  Future<void> _loadNearbyHospitals(double lat, double lng) async {
-    final response = await googlePlace.search.getNearBySearch(
-      Location(lat: lat, lng: lng),
-      3000,
-      type: "hospital",
-    );
-
-    if (response != null && response.results != null) {
-      setState(() {
-        _markers.clear();
-        for (var place in response.results!) {
-          var loc = place.geometry?.location;
-          if (loc != null) {
-            _markers.add(
-              Marker(
-                markerId: MarkerId(place.placeId ?? loc.lat.toString()),
-                position: LatLng(loc.lat!, loc.lng!),
-                // Remove default infoWindow to avoid conflicts
-                // Use onTap to show custom info card
-                onTap: () {
-                  if (place.placeId != null) {
-                    _showHospitalDetails(place.placeId!);
-                  }
-                },
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueRed,
-                ), // Red markers for hospitals
-              ),
-            );
-          }
-        }
-      });
-    }
-  }
-
-  void _showHospitalDetails(String placeId) async {
-    var details = await googlePlace.details.get(placeId);
-
-    if (details != null && details.result != null) {
-      setState(() {
-        selectedHospitalDetails = details.result!;
-      });
-    }
-  }
-
-  // Helper to launch directions in Google Maps app/browser
-  void _launchMapsDirections(double lat, double lng) async {
-    final url =
-        "https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving";
-    if (await canLaunch(url)) {
-      await launch(url);
+  void autoCompleteSearch(String value) async {
+    if (value.isNotEmpty) {
+      var result = await googlePlace.autocomplete.get(value, types: "hospital");
+      if (result != null && result.predictions != null && mounted) {
+        setState(() {
+          predictions = result.predictions!;
+        });
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Could not open maps for directions")),
-      );
+      setState(() {
+        predictions = [];
+      });
+    }
+  }
+
+  void _onPredictionTap(AutocompletePrediction prediction) async {
+    var details = await googlePlace.details.get(prediction.placeId!);
+    if (details != null && details.result != null) {
+      final location = details.result!.geometry!.location!;
+      final latLng = LatLng(location.lat!, location.lng!);
+
+      setState(() {
+        selectedMarker = Marker(
+          markerId: MarkerId(prediction.placeId!),
+          position: latLng,
+          infoWindow: InfoWindow(title: details.result!.name),
+        );
+        selectedHospitalName = details.result!.name;
+        selectedHospitalAddress = details.result!.formattedAddress ?? '';
+        predictions = [];
+      });
+
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
+    }
+  }
+
+  Future<void> _launchDirections() async {
+    if (selectedMarker == null) return;
+    final lat = selectedMarker!.position.latitude;
+    final lng = selectedMarker!.position.longitude;
+    final url = Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$lat,$lng");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: Column(
-        children: [
-          // TODO: Add search bar widget here if desired
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-          // Header or title for the map section
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "Nearby Hospitals",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+    return Stack(
+      children: [
+        // Google Map
+        GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: currentLocation ?? const LatLng(0, 0),
+            zoom: currentLocation == null ? 2 : 15,
           ),
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,
+          markers: selectedMarker != null ? {selectedMarker!} : {},
+          onMapCreated: (GoogleMapController controller) {
+            _controller.complete(controller);
+          },
+        ),
 
-          Expanded(
-            child: currentPosition == null
-                ? Center(child: CircularProgressIndicator())
-                : Stack(
-                    children: [
-                      GoogleMap(
-                        onMapCreated: (controller) =>
-                            mapController = controller,
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(
-                            currentPosition!.latitude,
-                            currentPosition!.longitude,
-                          ),
-                          zoom: 14,
-                        ),
-                        markers: _markers,
-                        myLocationEnabled: true,
-                        myLocationButtonEnabled: true,
-                        // When map is tapped outside markers, hide info card
-                        onTap: (_) {
-                          setState(() {
-                            selectedHospitalDetails = null;
-                          });
-                        },
-                      ),
-
-                      // Custom hospital info card shown when marker tapped
-                      if (selectedHospitalDetails != null)
-                        Positioned(
-                          left: 10,
-                          right: 10,
-                          bottom: 20,
-                          child: _HospitalInfoCard(
-                            details: selectedHospitalDetails!,
-                            onClose: () {
-                              setState(() {
-                                selectedHospitalDetails = null;
-                              });
-                            },
-                            onDirections: () {
-                              final loc =
-                                  selectedHospitalDetails!.geometry?.location;
-                              if (loc != null) {
-                                _launchMapsDirections(loc.lat!, loc.lng!);
-                              }
-                            },
-                          ),
-                        ),
-                    ],
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Widget for custom hospital info card
-class _HospitalInfoCard extends StatelessWidget {
-  final DetailsResult details;
-  final VoidCallback onClose;
-  final VoidCallback onDirections;
-
-  const _HospitalInfoCard({
-    Key? key,
-    required this.details,
-    required this.onClose,
-    required this.onDirections,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 8,
-      borderRadius: BorderRadius.circular(12),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    details.name ?? "Unknown Hospital",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        // Search bar
+        Positioned(
+          top: 40,
+          left: 15,
+          right: 15,
+          child: Column(
+            children: [
+              TextField(
+                controller: searchController,
+                onChanged: autoCompleteSearch,
+                decoration: InputDecoration(
+                  hintText: "Search hospitals...",
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: isDark ? Colors.grey[800] : Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
                   ),
                 ),
-                IconButton(icon: Icon(Icons.close), onPressed: onClose),
-              ],
-            ),
-            SizedBox(height: 8),
-            if (details.formattedAddress != null)
-              Row(
-                children: [
-                  Icon(Icons.location_on, size: 20),
-                  SizedBox(width: 8),
-                  Expanded(child: Text(details.formattedAddress!)),
-                ],
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
               ),
-            if (details.rating != null)
-              Row(
-                children: [
-                  Icon(Icons.star, size: 20, color: Colors.amber),
-                  SizedBox(width: 8),
-                  Text("${details.rating} / 5"),
-                ],
-              ),
-            if (details.openingHours?.openNow != null)
-              Row(
-                children: [
-                  Icon(Icons.access_time, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    details.openingHours!.openNow! ? "Open Now" : "Closed Now",
+              if (predictions.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(top: 5),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey[900] : Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
                   ),
-                ],
-              ),
-            SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: Icon(Icons.directions),
-              label: Text("Get Directions"),
-              onPressed: onDirections,
-            ),
-          ],
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: predictions.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: const Icon(Icons.local_hospital, color: Colors.red),
+                        title: Text(predictions[index].description ?? ""),
+                        onTap: () => _onPredictionTap(predictions[index]),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
         ),
-      ),
+
+        // Info card
+        if (selectedHospitalName != null)
+          Positioned(
+            bottom: 30,
+            left: 15,
+            right: 15,
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      selectedHospitalName!,
+                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(selectedHospitalAddress ?? '', style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      onPressed: _launchDirections,
+                      icon: const Icon(Icons.directions),
+                      label: const Text("Get Directions"),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(40),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+        // Current Location Button
+        Positioned(
+          bottom: 100,
+          right: 15,
+          child: FloatingActionButton(
+            heroTag: "currentLocationBtn",
+            backgroundColor: Colors.blue,
+            onPressed: _getCurrentLocation,
+            child: const Icon(Icons.my_location, color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 }

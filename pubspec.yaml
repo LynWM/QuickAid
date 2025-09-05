@@ -34,7 +34,7 @@ dependencies:
   http: ^0.13.6
   google_place: ^0.4.7
 
-  firebase_core: ^3.6.0
+  firebase_core: ^3.15.2
   firebase_auth: ^5.3.0
   cloud_firestore: ^5.4.4
 
@@ -46,10 +46,13 @@ dependencies:
   cupertino_icons: ^1.0.8
   font_awesome_flutter: ^10.9.0 
   google_nav_bar: ^5.0.6
-  geolocator: ^11.1.0
+  geolocator: ^14.0.2
   google_maps_flutter: ^2.6.1
   permission_handler: ^11.0.1
   google_places_flutter: ^2.0.6
+
+  fl_chart: ^1.1.0
+  
  
 
   #flutter_map: ^6.2.1
@@ -63,7 +66,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.4
 
 flutter_launcher_icons:
   android: true

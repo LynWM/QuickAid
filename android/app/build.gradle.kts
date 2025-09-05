@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.quick_aid_app"
-    compileSdk = 34
+    compileSdk = 36
     ndkVersion = "29.0.13599879"
 
     compileOptions {
