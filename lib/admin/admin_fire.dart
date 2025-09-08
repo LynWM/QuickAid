@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AdminFirePage extends StatelessWidget {
+class AdminFirePage extends StatefulWidget {
+  @override
+  State<AdminFirePage> createState() => _AdminFirePageState();
+}
+
+class _AdminFirePageState extends State<AdminFirePage> {
   final CollectionReference fireContacts = FirebaseFirestore.instance
-      .collection('hotlines')
-      .doc('Fire')
+      .collection('hotline_categories')
+      .doc('fire')
       .collection('contacts');
 
   @override

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AdminAmbulancePage extends StatelessWidget {
+class AdminAmbulancePage extends StatefulWidget {
+  @override
+  State<AdminAmbulancePage> createState() => _AdminAmbulancePageState();
+}
+
+class _AdminAmbulancePageState extends State<AdminAmbulancePage> {
   final CollectionReference ambulanceContacts = FirebaseFirestore.instance
-      .collection('hotlines')
-      .doc('Ambulance')
+      .collection('hotline_categories')
+      .doc('ambulance')
       .collection('contacts');
 
   @override
