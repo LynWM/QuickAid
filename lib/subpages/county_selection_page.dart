@@ -15,6 +15,7 @@ class CountySelectionPage extends StatefulWidget {
 class _CountySelectionPageState extends State<CountySelectionPage> {
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     final String categoryId = widget.data.id;
 
     return Scaffold(

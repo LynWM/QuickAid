@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -5,6 +6,7 @@ import 'package:quick_aid_app/pages/home_page.dart';
 import 'package:quick_aid_app/pages/settings_page.dart';
 import 'package:quick_aid_app/admin/admin_guides_page.dart';
 import 'package:quick_aid_app/admin/admin_hotlines_page.dart';
+import 'package:quick_aid_app/services/login_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -142,7 +144,7 @@ class _AdminDashboardPageState extends State<DashboardPage> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const HomePage(),
+                          builder: (context) => const HomePage(role: 'widget.role',),
                         ),
                       );
                     },
@@ -176,12 +178,22 @@ class _AdminDashboardPageState extends State<DashboardPage> {
               padding: const EdgeInsets.only(left: 25.0, bottom: 25),
 
               child: ListTile(
-                leading: const Icon(Icons.logout, color: Colors.white),
-                title: const Text(
-                  'EXIT APP',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
+                    leading: const Icon(Icons.logout, color: Colors.white),
+                    title: const Text(
+                      'LOG OUT',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () async {
+                      await FirebaseAuth.instance.signOut();
+
+                      //navigating to login page
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                        (route) => false,
+                      );
+                    },
+                  ),
             ),
           ],
         ),

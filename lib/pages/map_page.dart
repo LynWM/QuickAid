@@ -36,6 +36,7 @@ class _MapPageState extends State<MapPage> {
       return;
     }
 
+    // ignore: deprecated_member_use
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState(() {
       currentLocation = LatLng(position.latitude, position.longitude);

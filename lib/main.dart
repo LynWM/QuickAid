@@ -32,7 +32,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      home: startOnIntro? const IntroPage() : const AuthGate(),
+      initialRoute: startOnIntro? '/intro' : '/auth',
+      routes: {
+        '/intro': (context)=> const IntroPage(),
+        '/auth': (context) => const AuthGate(),
+      },
     );
   }
 }

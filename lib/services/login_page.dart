@@ -54,8 +54,6 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       Navigator.of(context).pop(); // Close loading dialog
 
-      Navigator.of(context).pop();//trying to remove the loop
-
       print(
         "Signed in as ${FirebaseAuth.instance.currentUser?.email}",
       ); //debug print

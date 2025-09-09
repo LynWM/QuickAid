@@ -1,37 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:quick_aid_app/admin/dashboard_page.dart';
 import 'package:quick_aid_app/pages/home_page.dart';
 import 'package:quick_aid_app/services/login_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
-  Future<String?> _getUserRole(String uid) async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .get();
-      if (doc.exists) {
-        final role = doc.data()?["role"] as String?;
-        if (role != null) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString("userRole", role); //save role
-        }
-        return role;
-      }
-    } catch (e) {
-      print("Error fetching role: $e");
-    }
-    return null;
-  }
+  Future<String> getUserRole(String uid) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
 
-  Future<String?> _getCachedRole() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString("userRole");
+    if (!snapshot.exists) return "user";
+
+    final data = snapshot.data() as Map<String, dynamic>;
+    return data['role'] as String? ?? "user";
   }
 
   @override
@@ -39,50 +25,46 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return LoginPage();
+        // Still checking auth state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
 
+        // User NOT logged in → LoginPage
+        if (!snapshot.hasData) {
+          return const LoginPage();
+        }
+
+        // User logged in → fetch role
         final user = snapshot.data!;
-
-        return FutureBuilder<String?>(
-          future: _getCachedRole(),
-          builder: (context, cacheSnapshot) {
-            if (cacheSnapshot.connectionState == ConnectionState.waiting) {
-              return Scaffold(body: Center(child: CircularProgressIndicator()));
+        return FutureBuilder<String>(
+          future: getUserRole(user.uid),
+          builder: (context, roleSnapshot) {
+            if (roleSnapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
             }
 
-            final cachedRole = cacheSnapshot.data;
-
-            if (cachedRole != null) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _getUserRole(user.uid);
-              });
-
-              if (cachedRole == "admin") {
-                return DashboardPage();
-              } else {
-                return HomePage();
-              }
+            if (!roleSnapshot.hasData) {
+              return const Scaffold(
+                body: Center(child: Text("Error loading role")),
+              );
             }
 
-            //fetching from firestore if no cached role
-            return FutureBuilder<String?>(
-              future: _getUserRole(user.uid),
-              builder: (context, roleSnapshot) {
-                if (roleSnapshot.connectionState == ConnectionState.waiting) {
-                  return HomePage();
-                }
+            final role = roleSnapshot.data!;
+            print("✅ AuthGate sending role → $role");
 
-                final role = roleSnapshot.data ?? "user";
-
-                if (role == "admin") {
-                  return DashboardPage();
-                } else {
-                  return HomePage();
-                }
-              },
-            );
+            // ✅ Route based on role
+            if (role == "admin") {
+              print("Going to dashboardPage");
+              return DashboardPage();
+            } else {
+              print("Going to Home Page");
+              return HomePage(role: role);
+            }
           },
         );
       },

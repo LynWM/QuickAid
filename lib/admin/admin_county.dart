@@ -10,6 +10,7 @@ class AdminCountyHotlinesPage extends StatefulWidget {
 
 class _AdminCountyHotlinesPageState extends State<AdminCountyHotlinesPage> {
   String? _selectedCountyId;
+  // ignore: unused_field
   String? _selectedCountyName;
 
   @override
@@ -161,6 +162,7 @@ class _AdminCountyHotlinesPageState extends State<AdminCountyHotlinesPage> {
   }
 
   // --- Edit existing county ---
+  // ignore: unused_element
   void _editCounty(QueryDocumentSnapshot doc) {
     final controller = TextEditingController(text: doc['title']);
     showDialog(
