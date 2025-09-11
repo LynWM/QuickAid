@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_aid_app/components/my_button.dart';
 import 'package:quick_aid_app/components/my_textfield.dart';
+import 'package:quick_aid_app/services/authgate_page.dart';
 import 'package:quick_aid_app/services/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -72,8 +73,11 @@ class _SigninPageState extends State<SignUpPage> {
 
       if (!mounted) return;
       Navigator.of(context).pop(); // close loading
-
-
+      
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => AuthGate()),
+        (route) => false,
+      );
     } on FirebaseAuthException catch (e) {
       Navigator.of(context).pop(); // close loading
       _showErrorDialog(e.message ?? "An error occurred.");
@@ -93,11 +97,12 @@ class _SigninPageState extends State<SignUpPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.person_add, size: 70, color: Colors.black),
-                const SizedBox(height: 30),
+                const Icon(Icons.person_add, size: 100,
+                color: Colors.black),
+                const SizedBox(height: 25),
                 Text(
                   'Create your Quick Aid Account',
-                  style: TextStyle(color: Colors.grey[700], fontSize: 18),
+                  style: TextStyle( fontSize: 18),
                 ),
                 const SizedBox(height: 25),
 
@@ -105,6 +110,7 @@ class _SigninPageState extends State<SignUpPage> {
                   controller: nameController,
                   hintText: 'Name',
                   obscureText: false,
+                  prefixIcon: Icons.person,
                 ),
                 const SizedBox(height: 20),
 
@@ -112,6 +118,7 @@ class _SigninPageState extends State<SignUpPage> {
                   controller: emailController,
                   hintText: 'Email',
                   obscureText: false,
+                  prefixIcon: Icons.email,
                 ),
                 const SizedBox(height: 20),
 
@@ -119,6 +126,7 @@ class _SigninPageState extends State<SignUpPage> {
                   controller: passwordController,
                   hintText: 'Password',
                   obscureText: true,
+                  prefixIcon: Icons.lock,
                 ),
 
                 const SizedBox(height: 25),
@@ -130,7 +138,7 @@ class _SigninPageState extends State<SignUpPage> {
                   children: [
                     Text(
                       'Already a member?',
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: TextStyle(),
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
@@ -143,9 +151,7 @@ class _SigninPageState extends State<SignUpPage> {
                       child: const Text(
                         'Log In',
                         style: TextStyle(
-                          color: Colors.blue,
                           fontWeight: FontWeight.bold,
-                          
                         ),
                       ),
                     ),

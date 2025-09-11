@@ -20,11 +20,27 @@ class _GuidesPageState extends State<GuidesPage> {
 
     return Column(
       children: [
-        const SizedBox(height: 20),
+        const SizedBox(height:30),
+        
+        // Section title
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 25.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'FIRST AID GUIDES',
+              style: TextStyle(fontWeight: FontWeight.bold,
+              fontSize: 18,
+              ),
+            )
+          ),
+        ),
+
+        
 
         //search bar for filtering guides
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 10.0),
           child: TextField(
             controller: searchController,
             onChanged: (value) {
@@ -33,7 +49,7 @@ class _GuidesPageState extends State<GuidesPage> {
               });
             },
             decoration: InputDecoration(
-              hintText: 'Search guides...',
+              hintText: 'Search for guides...',
               prefixIcon: Icon(Icons.search),
               filled: true,
               fillColor: isDark ? Colors.grey[800] : Colors.grey[200],
@@ -48,19 +64,6 @@ class _GuidesPageState extends State<GuidesPage> {
             style: TextStyle(color: isDark ? Colors.white : Colors.black),
           ),
         ),
-
-        const SizedBox(height: 20),
-
-        // Section title
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text('First Aid Guides'),
-          ),
-        ),
-
-        const SizedBox(height: 10),
 
         // Expanded guide list
         Expanded(
@@ -100,22 +103,33 @@ class _GuidesPageState extends State<GuidesPage> {
                   itemCount: filteredGuides.length,
                   itemBuilder: (context, index) {
                     final guide = filteredGuides[index];
-
                     final title = guide['title'];
                     final description = guide['description'];
 
                     return Card(
                       color: isDark ? Colors.grey[900] : Colors.white,
                       margin: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+
                       child: ListTile(
+                        leading: Icon(Icons.medical_services_rounded,
+
+                         color: Color(0xFF890000)),
                         title: Text(
                           title ?? 'No Title',
-                          style: theme.textTheme.bodyLarge,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
+                        
                         subtitle: Text(
                           description ?? 'No Description',
                           style: theme.textTheme.bodyLarge,
                         ),
+                        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[700]),
                         onTap: () {
                           Navigator.push(
                             context,

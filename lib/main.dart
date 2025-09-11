@@ -30,11 +30,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(),
+      theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFF890000),
+          foregroundColor: Colors.white,
+        ),
+      ),
+
       darkTheme: ThemeData.dark(),
-      initialRoute: startOnIntro? '/intro' : '/auth',
+
+      initialRoute: startOnIntro ? '/intro' : '/auth',
       routes: {
-        '/intro': (context)=> const IntroPage(),
+        '/intro': (context) => const IntroPage(),
         '/auth': (context) => const AuthGate(),
       },
     );

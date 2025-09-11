@@ -4,13 +4,15 @@ class MyTextField extends StatelessWidget {
   final controller;
   final String hintText;
   final bool obscureText;
+  final IconData? prefixIcon;
 
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
     required this.obscureText,
-    });
+    this.prefixIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +22,7 @@ class MyTextField extends StatelessWidget {
         controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
+          prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: Colors.grey[700]) : null,
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.white),
           ),

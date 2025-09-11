@@ -144,7 +144,7 @@ class _AdminDashboardPageState extends State<DashboardPage> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const HomePage(role: 'widget.role',),
+                          builder: (context) => HomePage(role: "admin"),
                         ),
                       );
                     },

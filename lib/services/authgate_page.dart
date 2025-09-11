@@ -58,13 +58,7 @@ class AuthGate extends StatelessWidget {
             print("✅ AuthGate sending role → $role");
 
             // ✅ Route based on role
-            if (role == "admin") {
-              print("Going to dashboardPage");
-              return DashboardPage();
-            } else {
-              print("Going to Home Page");
-              return HomePage(role: role);
-            }
+            return HomePage(role: role);
           },
         );
       },

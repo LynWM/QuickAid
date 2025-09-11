@@ -34,7 +34,7 @@ class MyBottomNavBar extends StatelessWidget {
             ),
             GButton(
             icon: Icons.phone,
-            text: 'Contacts',
+            text: 'Hotlines',
             ),
         ],
         ),

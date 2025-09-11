@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_aid_app/components/my_button.dart';
 import 'package:quick_aid_app/components/my_textfield.dart';
+import 'package:quick_aid_app/services/authgate_page.dart';
+import 'package:quick_aid_app/services/forgot_password.dart';
 import 'package:quick_aid_app/services/signup_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -54,10 +56,16 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       Navigator.of(context).pop(); // Close loading dialog
 
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => AuthGate()),
+        (route) => false,
+      );
+
       print(
         "Signed in as ${FirebaseAuth.instance.currentUser?.email}",
       ); //debug print
     } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
       Navigator.of(context).pop(); // Close loading dialog
 
       String errorMessage;
@@ -83,13 +91,13 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.lock, size: 100, color: Colors.black),
+                const Icon(Icons.person, size: 100, color: Colors.black),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 25),
 
                 Text(
                   'Welcome to Quick Aid!',
-                  style: TextStyle(color: Colors.grey[700], fontSize: 18),
+                  style: TextStyle( fontSize: 18),
                 ),
 
                 const SizedBox(height: 25),
@@ -98,6 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                   controller: emailController,
                   hintText: 'Email',
                   obscureText: false,
+                  prefixIcon: Icons.email,
                 ),
 
                 const SizedBox(height: 20),
@@ -106,31 +115,46 @@ class _LoginPageState extends State<LoginPage> {
                   controller: passwordController,
                   hintText: 'Password',
                   obscureText: true,
+                  prefixIcon: Icons.lock,
                 ),
 
                 const SizedBox(height: 15),
 
+                //Forgot Password
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment:MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Colors.grey[600]),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(builder: (context) => ForgotPassword()),
+                            );
+                        },
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle( fontSize: 14),
+                        ),
                       ),
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 25),
-                MyButton(onTap: signUserIn, text: "Sign In"),
+
+                MyButton(onTap: signUserIn, text: "Log In"),
+
                 const SizedBox(height: 25),
+
+                //Sign Up
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       'Not a member?',
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: TextStyle(),
                     ),
                     const SizedBox(width: 4),
                     GestureDetector(
@@ -143,9 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text(
                         'Register Now',
                         style: TextStyle(
-                          color: Colors.blue,
                           fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
                         ),
                       ),
                     ),

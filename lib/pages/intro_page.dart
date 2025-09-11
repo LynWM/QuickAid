@@ -11,19 +11,21 @@ class IntroPage extends StatelessWidget {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25.0),
+
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
 
             children: [
-              //logo
-              Padding(
-                padding: const EdgeInsets.all(0),
-                child: Image.asset('lib/images/logo2.png', height: 320),
-              ),
 
+              //LOGO
+               Image.asset(
+                'lib/images/logo2.png',
+                height: MediaQuery.of(context).size.height * 0.30,
+                ),
+              
               //const SizedBox(height: 10),
 
-              //title
+              //TITLE
               const Text(
                 'QUICK AID',
                 style: TextStyle(
@@ -33,18 +35,19 @@ class IntroPage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 25),
+              const SizedBox(height: 15),
 
-              //subtitle
+              //SUBTITLE
               const Text(
                 'Your Emergency First Aid Help',
-                style: TextStyle(color: Colors.white, fontSize: 20),
+                style: TextStyle(color: Colors.white,
+                fontSize: 18),
                 textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: 25),
+              const SizedBox(height: 40),
 
-              //get started button
+              //BUTTON => GetStarted
               GestureDetector(
                 onTap: () async {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -54,20 +57,23 @@ class IntroPage extends StatelessWidget {
                   );
                 },
 
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  
-                  padding: const EdgeInsets.all(25),
-                  child: const Center(
-                    child: Text(
-                      'Get Started',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: const Center(
+                      child: Text(
+                        'Get Started',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
                       ),
                     ),
                   ),
