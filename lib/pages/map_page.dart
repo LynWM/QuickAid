@@ -120,30 +120,30 @@ class _MapPageState extends State<MapPage> {
             controller: searchController,
             onChanged: autoCompleteSearch,
             decoration: InputDecoration(
-              hintText: "Search hospitals...",
+              hintText: "Search for hospitals...",
               prefixIcon: const Icon(Icons.search),
               suffixIcon: searchController.text.isNotEmpty
-                   ? IconButton(
+                  ? IconButton(
                       icon: const Icon(Icons.clear),
                       onPressed: () {
                         searchController.clear();
                         setState(() => predictions = []);
                       },
                     )
-                    : null,
-                  filled: true,
-                  fillColor: isDark ? Colors.grey[800] : Colors.white,
-                  border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
+                  : null,
+              filled: true,
+              fillColor: isDark ? Colors.grey[800] : Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
               ),
-              style: TextStyle(color: isDark ? Colors.white : Colors.black),
             ),
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
           ),
+        ),
 
-          // 🔽 Predictions list or map
-          if (predictions.isNotEmpty)
+        // 🔽 Predictions list or map
+        if (predictions.isNotEmpty)
           Expanded(
             child: ListView.builder(
               itemCount: predictions.length,
@@ -157,111 +157,141 @@ class _MapPageState extends State<MapPage> {
             ),
           )
         else
-        Expanded(
-          child: Stack(
-            children: [
-              // 🗺️ Google Map
-              GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: currentLocation ?? const LatLng(0, 0),
-                  zoom: currentLocation == null ? 2 : 15,
+          Expanded(
+            child: Stack(
+              children: [
+                // 🗺️ Google Map
+                GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: currentLocation ?? const LatLng(0, 0),
+                    zoom: currentLocation == null ? 2 : 15,
+                  ),
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: false,
+                  markers: selectedMarker != null ? {selectedMarker!} : {},
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
                 ),
-                myLocationEnabled: true,
-                myLocationButtonEnabled: false,
-                markers: selectedMarker != null ? {selectedMarker!} : {},
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                },
-              ),
 
-              // 🏥 Info card
-              if (selectedHospitalName != null)
-                Positioned(
-                  bottom: 30,
-                  left: 15,
-                  right: 15,
-                  child: Card(
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          //Hospital name
-                          Text(
-                            selectedHospitalName!,
-                            style: theme.textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-
-                          const SizedBox(height: 5),
-                          
-                          //Hospital Address
-                          Text(selectedHospitalAddress ?? '',
-                              style: theme.textTheme.bodyMedium),
-                          const SizedBox(height: 10),
-
-                          //Hospital Contact
-                          if (selectedHospitalPhone != null) ...[
+                // 🏥 Info card
+                if (selectedHospitalName != null)
+                  Positioned(
+                    bottom: 30,
+                    left: 15,
+                    right: 15,
+                    child: Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            //Hospital name
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(Icons.phone, size: 18, color: Color(0xFF890000)),
-                                const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    selectedHospitalPhone!,
-                                    style: theme.textTheme.bodyMedium,
+                                    selectedHospitalName!,
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.close, color: Colors.grey),
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedHospitalName = null;
+                                      selectedHospitalAddress = null;
+                                      selectedHospitalPhone = null;
+                                      selectedMarker = null;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            //Hospital Address
+                            if (selectedHospitalAddress != null && selectedHospitalAddress!.isNotEmpty) ...[
+                              Text(
+                              selectedHospitalAddress ?? '',
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                            const SizedBox(height: 10)
+                            ],
+
+                            //Hospital Contact
+                            if (selectedHospitalPhone != null && selectedHospitalPhone!.isNotEmpty) ...[
+                              Row(
+                                children: [
+                                  Text('Phone:'),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      selectedHospitalPhone!,
+                                      style: theme.textTheme.bodyMedium,
+                                    ),
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.call, color: Colors.green),
                                     onPressed: () {
-                                      final phoneUri = Uri(scheme: "tel", path: selectedHospitalPhone);
+                                      final phoneUri = Uri(
+                                        scheme: "tel",
+                                        path: selectedHospitalPhone,
+                                      );
                                       launchUrl(phoneUri);
-                                    }, 
+                                    },
                                   ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                          ],
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                            ],
 
-                          //Directions
-                          ElevatedButton.icon(
-                            onPressed: _launchDirections,
-                            icon: const Icon(Icons.directions),
-                            label: const Text("Get Directions"),
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size.fromHeight(40),
-                              backgroundColor: const Color(0xFF890000),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                            //Directions
+                            ElevatedButton.icon(
+                              onPressed: _launchDirections,
+                              icon: const Icon(Icons.directions),
+                              label: const Text(
+                                "Get Directions",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size.fromHeight(40),
+                                backgroundColor: const Color(0xFF890000),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-              // 📍 Current Location Button
-              Positioned(
-                bottom: 100,
-                right: 15,
-                child: FloatingActionButton(
-                  heroTag: "currentLocationBtn",
-                  backgroundColor: Colors.blue,
-                  onPressed: _getCurrentLocation,
-                  child: const Icon(Icons.my_location, color: Colors.white),
+                // 📍 Current Location Button
+                Positioned(
+                  top: 20,
+                  right: 15,
+                  child: FloatingActionButton(
+                    heroTag: "currentLocationBtn",
+                    backgroundColor: Colors.blue,
+                    onPressed: _getCurrentLocation,
+                    child: const Icon(Icons.my_location, color: Colors.white),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-    ],
-  );
-}
+      ],
+    );
+  }
 }

@@ -136,6 +136,7 @@ class _AdminDashboardPageState extends State<DashboardPage> {
                 //other pages
                 Padding(
                   padding: const EdgeInsets.only(left: 25.0),
+
                   child: ListTile(
                     leading: Icon(Icons.home, color: Colors.white),
                     title: Text('HOME', style: TextStyle(color: Colors.white)),
@@ -150,6 +151,22 @@ class _AdminDashboardPageState extends State<DashboardPage> {
                     },
                   ),
                 ),
+
+                Padding(
+                  padding: const EdgeInsets.only(left: 25.0),
+
+                  child: ListTile(
+                    leading: Icon(Icons.settings, color: Colors.white),
+                    title: Text(
+                      'PROFILE',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      
+                    },
+                  ),
+                ),
+
 
                 Padding(
                   padding: const EdgeInsets.only(left: 25.0),
@@ -207,7 +224,7 @@ class _AdminDashboardPageState extends State<DashboardPage> {
             // --- Management cards ---
             Card(
               child: ListTile(
-                contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                 leading: const Icon(
                   Icons.menu_book,
                   size: 32,
@@ -231,7 +248,7 @@ class _AdminDashboardPageState extends State<DashboardPage> {
 
             Card(
               child: ListTile(
-                contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                 leading: const Icon(Icons.phone, color: Color(0xFF890000), size: 32),
                 title: const Text(
                   "Manage Hotlines",
@@ -316,7 +333,7 @@ class _AdminDashboardPageState extends State<DashboardPage> {
 
             const SizedBox(height: 26),
 
-            // Pie Chart for hotline breakdown
+            // Pie Chart Title
             Text(
               "Hotlines Breakdown",
               style: theme.textTheme.titleMedium!.copyWith(
@@ -393,13 +410,13 @@ class _AdminDashboardPageState extends State<DashboardPage> {
   Color _getCategoryColor(String category) {
     switch (category) {
       case "Fire":
-        return Colors.red;
+        return Colors.redAccent;
       case "Ambulance":
         return Colors.green;
       case "County":
-        return Colors.orange;
+        return Colors.orangeAccent;
       case "General":
-        return Colors.blue;
+        return Colors.blueAccent;
       default:
         return Colors.grey;
     }

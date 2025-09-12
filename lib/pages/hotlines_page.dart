@@ -5,7 +5,6 @@ import 'package:quick_aid_app/subpages/county_selection_page.dart';
 import 'package:quick_aid_app/subpages/fire_details_page.dart';
 import 'package:quick_aid_app/subpages/general_emergencies_page.dart';
 
-
 class HotlinesPage extends StatefulWidget {
   const HotlinesPage({super.key});
 
@@ -72,57 +71,82 @@ class _HotlinesPageState extends State<HotlinesPage> {
 
               final categories = snapshot.data!.docs;
 
-              return ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+              return GridView.builder(
+                padding: const EdgeInsets.all(16),
                 itemCount: categories.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                  childAspectRatio: 1.2,
+                ),
+
                 itemBuilder: (context, index) {
                   final category = categories[index];
                   final icon = category['icon'];
-                  final title = category['title'];
+                  final title = category['title'] ?? 'No Title';
 
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      leading: _getIcon(icon),
-                      title: Text(title ?? 'No Title'),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  return GestureDetector(
+                    onTap: () {
+                      final titleText = title.toLowerCase();
 
-                      //onTap functionality for each section
-                      onTap: () {
-                        final title = category['title'].toString().toLowerCase();
+                      if (titleText.contains('ambulance')) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AmbulanceDetailsPage(data: category),
+                          ),
+                        );
+                      } else if (titleText.contains('fire')) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                FireDetailsPage(data: category),
+                          ),
+                        );
+                      } else if (titleText.contains('county')) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                CountySelectionPage(data: category),
+                          ),
+                        );
+                      } else if (titleText.contains('general')) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                GeneralEmergenciesPage(data: category),
+                          ),
+                        );
+                      }
+                    },
 
-                        if (title.contains('ambulance')) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  AmbulanceDetailsPage(data: category),
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusGeometry.circular(12),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _getIcon(icon),
+
+                          const SizedBox(height: 14),
+
+                          Text(
+                            title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
-                          );
-                        } else if (title.contains('fire')) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  FireDetailsPage(data: category),
-                            ),
-                          );
-                        } else if (title.contains('county')) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  CountySelectionPage(data: category),
-                            ));
-                        } else if (title.contains('general')) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  GeneralEmergenciesPage(data: category),
-                            ));
-                        }
-                      },
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },

@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_aid_app/subpages/county_contact_page.dart';
 
-
 class CountySelectionPage extends StatefulWidget {
   final DocumentSnapshot data;
 
@@ -13,10 +12,13 @@ class CountySelectionPage extends StatefulWidget {
 }
 
 class _CountySelectionPageState extends State<CountySelectionPage> {
+  TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
-    final String categoryId = widget.data.id;
+    
+    final categoryId = widget.data.id;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,16 +36,33 @@ class _CountySelectionPageState extends State<CountySelectionPage> {
         children: [
           const SizedBox(height: 20),
 
-          //add search bar with controller if needed
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              'Counties',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          //SEARCH BAR
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 25.0,
+              vertical: 10.0,
+            ),
+            child: TextField(
+              controller: searchController,
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value.toLowerCase();
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search for a county...',
+                prefixIcon: Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
           ),
+          const SizedBox(height: 20),
 
-          const SizedBox(height: 15),
 
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
@@ -72,7 +91,8 @@ class _CountySelectionPageState extends State<CountySelectionPage> {
                       ),
                       child: ListTile(
                         title: Text(title),
-                        trailing: const Icon(Icons.arrow_forward_ios),
+                        leading: const Icon(Icons.location_city_rounded),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                         onTap: () {
                           Navigator.push(
                             context,

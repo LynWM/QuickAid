@@ -88,6 +88,16 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
 
+                //Profile
+                ListTile(
+                  leading: const Icon(
+                    Icons.person, color: Colors.white),
+                    title: const Text('PROFILE', style: TextStyle(color: Colors.white)),
+                    onTap: () {
+                      //navigatorpop to profile page (still in progress)
+                    },
+                ),
+
                 // Settings
                 ListTile(
                   leading: const Icon(Icons.settings, color: Colors.white),

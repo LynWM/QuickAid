@@ -16,7 +16,9 @@ class _AdminCountyHotlinesPageState extends State<AdminCountyHotlinesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Manage County Hotlines")),
+      appBar: AppBar(title: const Text("Manage County Hotlines"),
+      backgroundColor: const Color(0xFF890000),
+      centerTitle: true),
       body: Column(
         children: [
           // --- Counties Dropdown ---
@@ -32,10 +34,9 @@ class _AdminCountyHotlinesPageState extends State<AdminCountyHotlinesPage> {
 
               return Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
+                child: Column(
                   children: [
-                    Expanded(
-                      child: DropdownButton<String>(
+                      DropdownButton<String>(
                         isExpanded: true,
                         value: _selectedCountyId,
                         hint: const Text("Select County"),
@@ -63,7 +64,62 @@ class _AdminCountyHotlinesPageState extends State<AdminCountyHotlinesPage> {
                           }
                         },
                       ),
-                    ),
+
+                      const SizedBox(height:8),
+
+                      //Manage Counties
+                      TextButton.icon(
+                        onPressed: () {
+                          showDialog(
+                            context: context, 
+                            builder: (_) {
+                              return AlertDialog(
+                                title: Text("Manage Counties"),
+                                content: SizedBox(
+                                  width: double.maxFinite,
+                                  child: ListView(
+                                    shrinkWrap: true,
+                                    children: snapshot.data!.docs.map((doc) {
+                                      return ListTile(
+                                        title: Text(doc['title']),
+                                        trailing: IconButton(
+                                          icon: Icon(Icons.delete, color: Colors.redAccent),
+                                          onPressed: () async {
+                                            await FirebaseFirestore.instance
+                                              .collection('hotline_categories')
+                                              .doc('county')
+                                              .collection('contacts')
+                                              .doc(doc.id)
+                                              .delete();
+
+                                              //if delected county was selected
+                                              if (_selectedCountyId == doc.id) {
+                                                setState(() {
+                                                  _selectedCountyId = null;
+                                                  _selectedCountyName = null;
+                                                });
+                                              }
+
+                                              Navigator.pop(context);
+                                          }, 
+                                          ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text("Close"),
+                                    ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        icon: Icon(Icons.manage_accounts),
+                        label: Text("Manage Counties")
+                      ),
                   ],
                 ),
               );
@@ -99,7 +155,7 @@ class _AdminCountyHotlinesPageState extends State<AdminCountyHotlinesPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(Icons.edit, color: Colors.blue),
+                                    icon: const Icon(Icons.edit, color: Colors.grey),
                                     onPressed: () => _editService(doc),
                                   ),
                                   IconButton(

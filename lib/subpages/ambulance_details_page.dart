@@ -59,16 +59,6 @@ class _AmbulanceDetailsPageState extends State<AmbulanceDetailsPage> {
 
           const SizedBox(height: 20),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              'Ambulance Services',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-              ),
-          ),
-
-          const SizedBox(height: 15),
-
           Expanded(
             child: StreamBuilder<QuerySnapshot>(stream: FirebaseFirestore.instance
                   .collection('hotline_categories')

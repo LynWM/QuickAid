@@ -48,11 +48,11 @@ class GuideDetailsPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             //Illustration(firestore)
-            if (imageUrl != null && imageUrl.isNotEmpty)
+            if (data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty)
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
-                  imageUrl,
+                  data['imageUrl'],
                   width: double.infinity,
                   height: 200,
                   fit: BoxFit.cover,

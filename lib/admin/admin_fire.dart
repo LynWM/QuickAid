@@ -17,7 +17,8 @@ class _AdminFirePageState extends State<AdminFirePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Manage Fire Hotlines"),
-        backgroundColor: Colors.red,
+        backgroundColor: const Color(0xFF890000),
+        centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: fireContacts.snapshots(),
@@ -41,14 +42,14 @@ class _AdminFirePageState extends State<AdminFirePage> {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 child: ListTile(
-                  leading: const Icon(Icons.local_fire_department, color: Colors.red, size: 32),
+                  leading: const Icon(Icons.local_fire_department, color: Colors.redAccent, size: 32),
                   title: Text(name),
                   subtitle: Text(phone),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        icon: const Icon(Icons.edit, color: Colors.grey),
                         onPressed: () {
                           _showContactDialog(context, contact.id, name, phone);
                         },
@@ -68,7 +69,7 @@ class _AdminFirePageState extends State<AdminFirePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.grey,
         child: const Icon(Icons.add),
         onPressed: () {
           _showContactDialog(context, null, "", "");

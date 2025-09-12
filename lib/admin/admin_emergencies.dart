@@ -18,7 +18,8 @@ class _AdminGeneralEmergenciesPageState extends State<AdminGeneralEmergenciesPag
     return Scaffold(
       appBar: AppBar(
         title: const Text("Manage General Emergencies"),
-        backgroundColor: Colors.orange,
+        backgroundColor: Color(0xFF890000),
+        centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: generalContacts.snapshots(),
@@ -42,14 +43,14 @@ class _AdminGeneralEmergenciesPageState extends State<AdminGeneralEmergenciesPag
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 child: ListTile(
-                  leading: const Icon(Icons.warning, color: Colors.orange, size: 32),
+                  leading: const Icon(Icons.warning_rounded, color: Colors.orangeAccent, size: 30),
                   title: Text(name),
                   subtitle: Text(phone),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        icon: const Icon(Icons.edit, color: Colors.grey),
                         onPressed: () {
                           _showContactDialog(context, contact.id, name, phone);
                         },
@@ -69,7 +70,7 @@ class _AdminGeneralEmergenciesPageState extends State<AdminGeneralEmergenciesPag
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.grey,
         child: const Icon(Icons.add),
         onPressed: () {
           _showContactDialog(context, null, "", "");
