@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:typed_data';
 
 class AdminGuidesPage extends StatefulWidget {
   const AdminGuidesPage({Key? key}) : super(key: key);
@@ -124,7 +124,13 @@ class _AdminGuidesPageState extends State<AdminGuidesPage> {
                   if (pickedImage != null)
                     Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Image.file(File(pickedImage!.path), height: 120),
+                      child: FutureBuilder<Uint8List>(
+                        future: pickedImage!.readAsBytes(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) return const SizedBox(height: 120);
+                          return Image.memory(snapshot.data!, height: 120);
+                        },
+                      ),
                     ),
                 ],
               ),
@@ -142,7 +148,8 @@ class _AdminGuidesPageState extends State<AdminGuidesPage> {
                       "guides_images/${DateTime.now().millisecondsSinceEpoch}.png",
                     );
 
-                    await storageRef.putFile(File(pickedImage!.path));
+                    final bytes = await pickedImage!.readAsBytes();
+                    await storageRef.putData(bytes);
                     imageUrl = await storageRef.getDownloadURL();
                   }
 
